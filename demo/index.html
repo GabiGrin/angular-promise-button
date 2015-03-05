@@ -1,0 +1,71 @@
+<html>
+<head>
+  <title>Angular Heatmap Demo</title>
+
+  <style>
+    .demo-container {
+      padding: 50px;
+    }
+
+    .heatmap-container {
+      margin-bottom: 10px;
+    }
+  </style>
+
+  <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css">
+  <link rel="stylesheet" href="../dist/angular-heatmap.css">
+</head>
+<body ng-app="demo">
+<div ng-controller="DemoCtrl" class="demo-container">
+
+  <div class="well">
+    <div class="form-group">
+      <label>Success message:</label>
+      <input ng-model="opts.resolvedTemplate" type="text" class="form-control"/>
+    </div>
+    <div class="form-group">
+      <label>Error message:</label>
+      <input ng-model="opts.rejectedTemplate" type="text" class="form-control"/>
+    </div>
+    <div class="form-group">
+      <label>Loading message:</label>
+      <input ng-model="opts.loadingTemplate" type="text" class="form-control"/>
+    </div>
+    <div class="form-group">
+      <label>Message duration:</label>
+      <input ng-model="opts.messageDuration" type="number" class="form-control"/>
+    </div>
+  </div>
+  <input type="checkbox" class="styled-cb" id="checkbox"
+         ng-model="result"/>
+  <label for="checkbox">Success?</label>
+  <button class="btn btn-primary" ng-click="doSomething()" promise-button="opts"> Test</button>
+
+  <hr/>
+  <h3>Config:</h3>
+  <pre>
+    {{opts | json}}
+  </pre>
+</div>
+</body>
+<script src="bower_components/jquery/dist/jquery.min.js"></script>
+<script src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+<script src="bower_components/angular/angular.min.js"></script>
+<script src="../dist/angular-promise-button.js"></script>
+<script src="//localhost:30000/livereload.js"></script>
+
+<script>
+  angular.module('demo', ['gg.promise-button'])
+    .controller('DemoCtrl', function ($scope, $q, $timeout) {
+      $scope.opts = {};
+      $scope.result = true;
+      $scope.doSomething = function () {
+        var dfd = $q.defer();
+        $timeout(function () {
+          $scope.result ? dfd.resolve(1) : dfd.reject(2);
+        }, 2000);
+        return dfd.promise;
+      }
+    });
+</script>
+</html>

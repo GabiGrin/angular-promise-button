@@ -1,0 +1,35 @@
+{
+  "name": "angular-promise-button",
+  "version": "0.1",
+  "authors": [
+    "GabiGrin <gabi.grinberg@gmail.com>"
+  ],
+  "main": "dist/angular-promise-button.js",
+  "repository": "git@github.com:GabiGrin/angular-promise-button.git",
+  "description": "Easily add loading/success/error states to buttons using promises",
+  "main": "dist/angular-promise-button.min.js",
+  "keywords": [
+    "angular",
+    "promise",
+    "button",
+    "loading",
+    "save",
+    "smart button"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "angular": "~1.3.0"
+  },
+  "devDependencies": {
+    "angular-mocks": "~1.3.0",
+    "bootstrap": "~3.2.0",
+    "angular-bootstrap": "~0.11.2"
+  }
+}
