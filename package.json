@@ -29,5 +29,8 @@
     "karma-osx-reporter": "^0.1.0",
     "karma-phantomjs-launcher": "^0.1.4",
     "matchdep": "^0.3.0"
+  },
+  "dependencies": {
+    "coveralls": "^2.11.2"
   }
 }

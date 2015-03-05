@@ -62,6 +62,16 @@ module.exports = function (grunt) {
         }
       }
     },
+    coveralls: {
+      options: {
+        // LCOV coverage file relevant to every target
+        force: true
+      },
+      all: {
+        // Target-specific LCOV coverage file
+        src: 'coverage/*/lcov.info'
+      }
+    },
     karma: {
       unit: {
         configFile: 'karma.conf.js'
