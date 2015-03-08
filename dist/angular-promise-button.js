@@ -6,15 +6,22 @@ angular.module('gg.promise-button', []);
     .directive('promiseButton', function ($log, $timeout, PromiseButton) {
 
       return {
-        priority: -1,
         restrict: 'A',
+        transclude: true,
+        template: '<span class="promise-button-container">' +
+        '<span class="original-content" ng-transclude></span>' +
+        '<span class="message"></span>' +
+        '</span>',
         link: function (scope, elem, attrs) {
           var warned = false;
           var opts = PromiseButton.getOptions(scope.$eval(attrs.promiseButtonOpts));
           var targetKey = attrs.promiseButtonTargetKey;
+          var originalContent = angular.element(elem[0].querySelector('.original-content'));
+          var messageNode = angular.element(elem[0].querySelector('.message')).detach();
+          var container = elem.children().eq(0);
+
           elem.bind('click', function () {
             //cancel original
-            var originalHtml = elem.html();
             var promise = scope.$eval(attrs.promiseButton);
 
             function finalize(status) {
@@ -27,11 +34,14 @@ angular.module('gg.promise-button', []);
                   }
                 } else {
                   var message = status ? opts.resolvedTemplate : opts.rejectedTemplate;
-                  elem.html(message);
+                  messageNode.html(message);
+                  originalContent.detach();
+                  container.append(messageNode);
                   elem.removeAttr('disabled');
 
                   $timeout(function () {
-                    elem.html(originalHtml);
+                    messageNode.detach();
+                    container.append(originalContent);
                   }, opts.messageDuration);
                 }
               };
@@ -41,7 +51,9 @@ angular.module('gg.promise-button', []);
               if (targetKey) {
                 PromiseButton.setButtonLoading(targetKey);
               } else {
-                elem.html(opts.loadingTemplate);
+                originalContent.detach();
+                container.append(messageNode);
+                messageNode.html(opts.loadingTemplate);
                 elem.attr('disabled', true);
               }
               promise.then(finalize(true), finalize(false));
@@ -51,7 +63,6 @@ angular.module('gg.promise-button', []);
                 warned = true;
               }
             }
-
           });
         }
       };

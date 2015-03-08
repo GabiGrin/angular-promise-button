@@ -106,7 +106,7 @@ describe('promise button ', function () {
       $timeout.flush();
       $scope.$digest();
 
-      expect(elem.html()).toBe(defaultOptions.resolvedTemplate);
+      expect(elem.text()).toBe(defaultOptions.resolvedTemplate);
 
       $scope.loadData = function () {
         return fakePromise('data', true);
@@ -115,7 +115,7 @@ describe('promise button ', function () {
       elem.triggerHandler('click');
       $timeout.flush();
       $scope.$digest();
-      expect(elem.html()).toBe(defaultOptions.rejectedTemplate);
+      expect(elem.text()).toBe(defaultOptions.rejectedTemplate);
     });
 
     it('should warn if onclick handler did not return promise, but just once', function () {
@@ -183,13 +183,13 @@ describe('promise button ', function () {
       var elem2 = createDirective('<button promise-button="loadData()" promise-button-target-key="someKey">Other loader</button>');
 
       elem2.triggerHandler('click');
-      expect(elem2.html()).toBe('Other loader');
-      expect(elem.html()).toBe(defaultOptions.loadingTemplate);
+      expect(elem2.text()).toBe('Other loader');
+      expect(elem.text()).toBe(defaultOptions.loadingTemplate);
       $scope.$digest();
 
       $timeout.flush();
-      expect(elem.html()).toBe(defaultOptions.resolvedTemplate);
-      expect(elem2.html()).toBe('Other loader');
+      expect(elem.text()).toBe(defaultOptions.resolvedTemplate);
+      expect(elem2.text()).toBe('Other loader');
 
       $scope.loadData = function () {
         return fakePromise('data', true);
@@ -197,8 +197,8 @@ describe('promise button ', function () {
 
       elem2.triggerHandler('click');
       $timeout.flush();
-      expect(elem.html()).toBe(defaultOptions.rejectedTemplate);
-      expect(elem2.html()).toBe('Other loader');
+      expect(elem.text()).toBe(defaultOptions.rejectedTemplate);
+      expect(elem2.text()).toBe('Other loader');
 
     });
   });
@@ -226,11 +226,11 @@ describe('promise button ', function () {
       PromiseButton.setButtonSuccess('someKey');
       $scope.$digest();
 
-      expect(elem.html()).toBe(defaultOptions.resolvedTemplate);
+      expect(elem.text()).toBe(defaultOptions.resolvedTemplate);
 
       PromiseButton.setButtonError('someKey');
       $scope.$digest();
-      expect(elem.html()).toBe(defaultOptions.rejectedTemplate);
+      expect(elem.text()).toBe(defaultOptions.rejectedTemplate);
     });
 
     it('should return to original text after some time', function () {
@@ -238,7 +238,7 @@ describe('promise button ', function () {
       $scope.$digest();
       PromiseButton.setButtonSuccess('someKey');
       $scope.$digest();
-      expect(elem.html()).toBe(defaultOptions.resolvedTemplate);
+      expect(elem.text()).toBe(defaultOptions.resolvedTemplate);
 
       $timeout.flush();
       $scope.$digest();
