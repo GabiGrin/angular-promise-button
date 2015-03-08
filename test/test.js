@@ -188,7 +188,6 @@ describe('promise button ', function () {
       $scope.$digest();
 
       $timeout.flush();
-      $scope.$digest();
       expect(elem.html()).toBe(defaultOptions.resolvedTemplate);
       expect(elem2.html()).toBe('Other loader');
 
@@ -196,10 +195,10 @@ describe('promise button ', function () {
         return fakePromise('data', true);
       };
 
-      elem.triggerHandler('click');
+      elem2.triggerHandler('click');
       $timeout.flush();
-      $scope.$digest();
       expect(elem.html()).toBe(defaultOptions.rejectedTemplate);
+      expect(elem2.html()).toBe('Other loader');
 
     });
   });
