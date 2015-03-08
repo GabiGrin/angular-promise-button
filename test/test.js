@@ -88,7 +88,7 @@ describe('promise button ', function () {
       $scope.loadData = function () {
         return fakePromise('data');
       };
-      var elem = createDirective('<button promise-button ng-click="loadData()">Load data</button>');
+      var elem = createDirective('<button promise-button="loadData()">Load data</button>');
 
       elem.triggerHandler('click');
       $scope.$digest();
@@ -100,7 +100,7 @@ describe('promise button ', function () {
       $scope.loadData = function () {
         return fakePromise('data');
       };
-      var elem = createDirective('<button promise-button ng-click="loadData()">Load data</button>');
+      var elem = createDirective('<button promise-button="loadData()">Load data</button>');
 
       elem.triggerHandler('click');
       $timeout.flush();
@@ -122,7 +122,7 @@ describe('promise button ', function () {
       $scope.loadData = function () {
         $scope.someVar = 'yo';
       };
-      var elem = createDirective('<button promise-button ng-click="loadData()">Load data</button>');
+      var elem = createDirective('<button promise-button="loadData()">Load data</button>');
       spyOn($log, 'warn');
       elem.triggerHandler('click');
       $scope.$digest();
@@ -137,7 +137,7 @@ describe('promise button ', function () {
       $scope.loadData = function () {
         $scope.someVar = 'yo';
       };
-      var elem = createDirective('<button promise-button ng-click="loadData()">Load data</button>');
+      var elem = createDirective('<button promise-button="loadData()">Load data</button>');
 
       elem.triggerHandler('click');
 
@@ -149,7 +149,7 @@ describe('promise button ', function () {
       $scope.loadData = function () {
         return fakePromise('data');
       };
-      var elem = createDirective('<button promise-button ng-click="loadData()">Load data</button>');
+      var elem = createDirective('<button promise-button="loadData()">Load data</button>');
 
       elem.triggerHandler('click');
       $timeout.flush();
@@ -168,7 +168,7 @@ describe('promise button ', function () {
         loadingTemplate: '1, 2, 3'
       };
 
-      var elem = createDirective('<button promise-button="opts" ng-click="loadData()">Load data</button>');
+      var elem = createDirective('<button promise-button-opts="opts" promise-button="loadData()">Load data</button>');
 
       elem.triggerHandler('click');
       $scope.$digest();
@@ -179,8 +179,8 @@ describe('promise button ', function () {
       $scope.loadData = function () {
         return fakePromise('data');
       };
-      var elem = createDirective('<button promise-button ng-click="loadData()" promise-button-key="someKey">Load data</button>');
-      var elem2 = createDirective('<button promise-button ng-click="loadData()" promise-button-target-key="someKey">Other loader</button>');
+      var elem = createDirective('<button promise-button="loadData()" promise-button-key="someKey">Load data</button>');
+      var elem2 = createDirective('<button promise-button="loadData()" promise-button-target-key="someKey">Other loader</button>');
 
       elem2.triggerHandler('click');
       expect(elem2.html()).toBe('Other loader');
@@ -235,7 +235,7 @@ describe('promise button ', function () {
     });
 
     it('should return to original text after some time', function () {
-      var elem = createDirective('<button promise-button-key="someKey" ng-click="loadData()">Load data</button>');
+      var elem = createDirective('<button promise-button-key="someKey" promise-button="loadData()">Load data</button>');
       $scope.$digest();
       PromiseButton.setButtonSuccess('someKey');
       $scope.$digest();
@@ -254,8 +254,8 @@ describe('promise button ', function () {
       PromiseButton.setOptionsForKey('someKey2', {
         resolvedTemplate: 'Hooray'
       });
-      var elem = createDirective('<button promise-button-key="someKey" ng-click="loadData()">Load data</button>');
-      var elem2 = createDirective('<button promise-button-key="someKey2" ng-click="loadData()">Load data</button>');
+      var elem = createDirective('<button promise-button-key="someKey" promise-button="loadData()">Load data</button>');
+      var elem2 = createDirective('<button promise-button-key="someKey2" promise-button="loadData()">Load data</button>');
 
       PromiseButton.setButtonLoading('someKey');
       PromiseButton.setButtonLoading('someKey2');

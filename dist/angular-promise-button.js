@@ -10,14 +10,12 @@ angular.module('gg.promise-button', []);
         restrict: 'A',
         link: function (scope, elem, attrs) {
           var warned = false;
-          var opts = PromiseButton.getOptions(scope.$eval(attrs.promiseButton));
+          var opts = PromiseButton.getOptions(scope.$eval(attrs.promiseButtonOpts));
           var targetKey = attrs.promiseButtonTargetKey;
-          elem.bind('click', function (e) {
+          elem.bind('click', function () {
             //cancel original
             var originalHtml = elem.html();
-            e.stopImmediatePropagation();
-            e.preventDefault();
-            var promise = scope.$eval(attrs.ngClick);
+            var promise = scope.$eval(attrs.promiseButton);
 
             function finalize(status) {
               return function () {
