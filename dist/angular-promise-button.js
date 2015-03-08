@@ -70,8 +70,6 @@ angular.module('gg.promise-button', []);
           var originalHtml = elem.html();
           var eventPrefix = 'promiseButton.' + key + '.';
 
-          console.log('eventPrefix', eventPrefix);
-
           scope.$on(eventPrefix + 'loading', function () {
 
             elem.html(opts.loadingTemplate);
