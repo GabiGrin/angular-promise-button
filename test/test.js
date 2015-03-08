@@ -6,6 +6,7 @@
 describe('promise button ', function () {
   var $compile,
     $scope,
+    $rootScope,
     $q,
     $log,
     $timeout,
@@ -15,10 +16,12 @@ describe('promise button ', function () {
 
   beforeEach(function () {
     module('gg.promise-button');
+
     inject(function (_$compile_, $document, _$rootScope_, _$q_, _$timeout_, _$log_, _PromiseButton_) {
       $compile = _$compile_;
       body = $document.find('body').empty();
-      $scope = _$rootScope_;
+      $scope = _$rootScope_.$new();
+      $rootScope = _$rootScope_;
       $q = _$q_;
       $log = _$log_;
       $timeout = _$timeout_;
@@ -55,9 +58,31 @@ describe('promise button ', function () {
     it('should exist', function () {
       expect(PromiseButton).toBeDefined();
     });
+
+    it('should get and set options by key', function () {
+      var key = 'someKey';
+      PromiseButton.setOptionsForKey(key, {loadingTemplate: 'bob'});
+      expect(PromiseButton.getOptionsForKey(key).loadingTemplate).toBe('bob');
+      expect(PromiseButton.getOptionsForKey(key).messageDuration).toBe(defaultOptions.messageDuration);
+    });
+
+    it('should sent events to scope when an action is triggered by key', function () {
+      var spy = spyOn($rootScope, '$broadcast');
+
+      PromiseButton.setButtonLoading('someKey');
+      expect(spy).toHaveBeenCalledWith('promiseButton.someKey.loading');
+      spy.reset();
+
+      PromiseButton.setButtonSuccess('someKey2');
+      expect(spy).toHaveBeenCalledWith('promiseButton.someKey2.success');
+      spy.reset();
+
+      PromiseButton.setButtonError('someKey3');
+      expect(spy).toHaveBeenCalledWith('promiseButton.someKey3.error');
+    });
   });
 
-  describe('directive', function () {
+  describe('direct directive', function () {
 
     it('should switch to loading when clicked', function () {
       $scope.loadData = function () {
@@ -148,6 +173,74 @@ describe('promise button ', function () {
       elem.triggerHandler('click');
       $scope.$digest();
       expect(elem.text()).toBe('1, 2, 3');
+    });
+  });
+
+  describe('by key directive', function () {
+
+    it('should switch to loading when same key was set as loading', function () {
+      $scope.loadData = function () {
+        return fakePromise('data');
+      };
+      var elem = createDirective('<button promise-button-key="someKey">Load data</button>');
+      $scope.$digest();
+
+      PromiseButton.setButtonLoading('someKey');
+      $scope.$digest();
+
+      expect(elem.text()).toBe(defaultOptions.loadingTemplate);
+    });
+
+    it('should show success if promise passed or error if otherwise', function () {
+      var elem = createDirective('<button promise-button-key="someKey">Load data</button>');
+
+      $scope.$digest();
+
+      PromiseButton.setButtonSuccess('someKey');
+      $scope.$digest();
+
+      expect(elem.html()).toBe(defaultOptions.resolvedTemplate);
+
+      PromiseButton.setButtonError('someKey');
+      $scope.$digest();
+      expect(elem.html()).toBe(defaultOptions.rejectedTemplate);
+    });
+
+    it('should return to original text after some time', function () {
+      var elem = createDirective('<button promise-button-key="someKey" ng-click="loadData()">Load data</button>');
+      $scope.$digest();
+      PromiseButton.setButtonSuccess('someKey');
+      $scope.$digest();
+      expect(elem.html()).toBe(defaultOptions.resolvedTemplate);
+
+      $timeout.flush();
+      $scope.$digest();
+      expect(elem.text()).toBe('Load data');
+    });
+
+    it('should take options from service if overridden', function () {
+      PromiseButton.setOptionsForKey('someKey', {
+        loadingTemplate: '1, 2, 3'
+      });
+
+      PromiseButton.setOptionsForKey('someKey2', {
+        resolvedTemplate: 'Hooray'
+      });
+      var elem = createDirective('<button promise-button-key="someKey" ng-click="loadData()">Load data</button>');
+      var elem2 = createDirective('<button promise-button-key="someKey2" ng-click="loadData()">Load data</button>');
+
+      PromiseButton.setButtonLoading('someKey');
+      PromiseButton.setButtonLoading('someKey2');
+      $scope.$digest();
+      expect(elem.text()).toBe('1, 2, 3');
+      expect(elem2.text()).toBe(defaultOptions.loadingTemplate);
+
+      PromiseButton.setButtonSuccess('someKey');
+      PromiseButton.setButtonSuccess('someKey2');
+      $scope.$digest();
+
+      expect(elem.text()).toBe(defaultOptions.resolvedTemplate);
+      expect(elem2.text()).toBe('Hooray');
     });
   });
 

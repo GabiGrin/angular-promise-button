@@ -49,6 +49,48 @@ angular.module('gg.promise-button', []);
 ;(function () {
   'use strict';
   angular.module('gg.promise-button')
+    .directive('promiseButtonKey', function (PromiseButton, $timeout) {
+      return {
+        restrict: 'A',
+        link: function (scope, elem, attrs) {
+          var key = attrs.promiseButtonKey;
+          var opts = PromiseButton.getOptionsForKey(key);
+          var originalHtml = elem.html();
+          var eventPrefix = 'promiseButton.' + key + '.';
+
+          console.log('eventPrefix', eventPrefix);
+
+          scope.$on(eventPrefix + 'loading', function () {
+
+            elem.html(opts.loadingTemplate);
+            elem.attr('disabled', true);
+          });
+
+          scope.$on(eventPrefix + 'success', function () {
+            finalize(true);
+          });
+
+          scope.$on(eventPrefix + 'error', function () {
+            finalize(false);
+          });
+
+          function finalize(status) {
+            var message = status ? opts.resolvedTemplate : opts.rejectedTemplate;
+            elem.html(message);
+            elem.removeAttr('disabled');
+
+            $timeout(function () {
+              elem.html(originalHtml);
+            }, opts.messageDuration);
+          }
+        }
+      };
+    }
+  );
+})();
+;(function () {
+  'use strict';
+  angular.module('gg.promise-button')
     .provider('PromiseButton', function () {
 
       var defaultOptions = {
@@ -58,10 +100,34 @@ angular.module('gg.promise-button', []);
         messageDuration: 2000
       };
 
-      this.$get = function () {
+      var optsPerKey = {};
+
+      this.defaultOptions = defaultOptions;
+
+      this.$get = function ($rootScope) {
+
+        function broadcastEvent(name, key) {
+          $rootScope.$broadcast('promiseButton.' + key + '.' + name);
+        }
+
         return {
           getOptions: function (externalOptions) {
             return angular.extend({}, defaultOptions, externalOptions || {});
+          },
+          getOptionsForKey: function (key) {
+            return angular.extend({}, defaultOptions, optsPerKey[key] || {});
+          },
+          setOptionsForKey: function (key, opts) {
+            optsPerKey[key] = opts;
+          },
+          setButtonLoading: function (key) {
+            broadcastEvent('loading', key);
+          },
+          setButtonSuccess: function (key) {
+            broadcastEvent('success', key);
+          },
+          setButtonError: function (key) {
+            broadcastEvent('error', key);
           }
         };
       };
