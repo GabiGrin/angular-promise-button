@@ -174,6 +174,34 @@ describe('promise button ', function () {
       $scope.$digest();
       expect(elem.text()).toBe('1, 2, 3');
     });
+
+    it('should be able to affect other buttons using target-key attribute', function () {
+      $scope.loadData = function () {
+        return fakePromise('data');
+      };
+      var elem = createDirective('<button promise-button ng-click="loadData()" promise-button-key="someKey">Load data</button>');
+      var elem2 = createDirective('<button promise-button ng-click="loadData()" promise-button-target-key="someKey">Other loader</button>');
+
+      elem2.triggerHandler('click');
+      expect(elem2.html()).toBe('Other loader');
+      expect(elem.html()).toBe(defaultOptions.loadingTemplate);
+      $scope.$digest();
+
+      $timeout.flush();
+      $scope.$digest();
+      expect(elem.html()).toBe(defaultOptions.resolvedTemplate);
+      expect(elem2.html()).toBe('Other loader');
+
+      $scope.loadData = function () {
+        return fakePromise('data', true);
+      };
+
+      elem.triggerHandler('click');
+      $timeout.flush();
+      $scope.$digest();
+      expect(elem.html()).toBe(defaultOptions.rejectedTemplate);
+
+    });
   });
 
   describe('by key directive', function () {

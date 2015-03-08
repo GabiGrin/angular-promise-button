@@ -2,12 +2,14 @@
   'use strict';
   angular.module('gg.promise-button')
     .directive('promiseButton', function ($log, $timeout, PromiseButton) {
+
       return {
         priority: -1,
         restrict: 'A',
         link: function (scope, elem, attrs) {
           var warned = false;
           var opts = PromiseButton.getOptions(scope.$eval(attrs.promiseButton));
+          var targetKey = attrs.promiseButtonTargetKey;
           elem.bind('click', function (e) {
             //cancel original
             var originalHtml = elem.html();
@@ -17,19 +19,31 @@
 
             function finalize(status) {
               return function () {
-                var message = status ? opts.resolvedTemplate : opts.rejectedTemplate;
-                elem.html(message);
-                elem.removeAttr('disabled');
+                if (targetKey) {
+                  if (status) {
+                    PromiseButton.setButtonSuccess(targetKey);
+                  } else {
+                    PromiseButton.setButtonError(targetKey);
+                  }
+                } else {
+                  var message = status ? opts.resolvedTemplate : opts.rejectedTemplate;
+                  elem.html(message);
+                  elem.removeAttr('disabled');
 
-                $timeout(function () {
-                  elem.html(originalHtml);
-                }, opts.messageDuration);
+                  $timeout(function () {
+                    elem.html(originalHtml);
+                  }, opts.messageDuration);
+                }
               };
             }
 
             if (promise && promise.then) {
-              elem.html(opts.loadingTemplate);
-              elem.attr('disabled', true);
+              if (targetKey) {
+                PromiseButton.setButtonLoading(targetKey);
+              } else {
+                elem.html(opts.loadingTemplate);
+                elem.attr('disabled', true);
+              }
               promise.then(finalize(true), finalize(false));
             } else {
               if (!warned) {
