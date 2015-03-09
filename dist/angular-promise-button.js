@@ -56,35 +56,41 @@ angular.module('gg.promise-button', []);
 
           elem.bind('click', function () {
             //cancel original
-            var promise = scope.$eval(attrs.promiseButton);
 
-            function finalize(status) {
-              return function () {
-                if (targetKey) {
-                  if (status) {
-                    PromiseButton.setButtonSuccess(targetKey);
+            scope.$apply(function () {
+
+              var promise = scope.$eval(attrs.promiseButton);
+
+              function finalize(status) {
+                return function () {
+                  if (targetKey) {
+                    if (status) {
+                      PromiseButton.setButtonSuccess(targetKey);
+                    } else {
+                      PromiseButton.setButtonError(targetKey);
+                    }
                   } else {
-                    PromiseButton.setButtonError(targetKey);
+                    setResult(status);
                   }
-                } else {
-                  setResult(status);
-                }
-              };
-            }
+                };
+              }
 
-            if (promise && promise.then) {
-              if (targetKey) {
-                PromiseButton.setButtonLoading(targetKey);
+              if (promise && promise.then) {
+                if (targetKey) {
+                  PromiseButton.setButtonLoading(targetKey);
+                } else {
+                  setLoading();
+                }
+                promise.then(finalize(true), finalize(false));
               } else {
-                setLoading();
+                if (!warned) {
+                  $log.warn('click handler of promise-button must return a promise for it to work!');
+                  warned = true;
+                }
               }
-              promise.then(finalize(true), finalize(false));
-            } else {
-              if (!warned) {
-                $log.warn('click handler of promise-button must return a promise for it to work!');
-                warned = true;
-              }
-            }
+
+            });
+
           });
         }
       };

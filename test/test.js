@@ -84,7 +84,7 @@ describe('promise button ', function () {
       var elem = createDirective('<button promise-button="loadData()">Load data</button>');
 
       elem.triggerHandler('click');
-      $scope.$digest();
+      //$scope.$digest();
 
       expect(elem.text()).toBe(defaultOptions.loadingTemplate);
     });
@@ -97,7 +97,6 @@ describe('promise button ', function () {
 
       elem.triggerHandler('click');
       $timeout.flush();
-      $scope.$digest();
 
       expect(elem.text()).toBe(defaultOptions.successTemplate);
 
