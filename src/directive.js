@@ -1,22 +1,56 @@
 (function () {
   'use strict';
   angular.module('gg.promise-button')
-    .directive('promiseButton', function ($log, $timeout, PromiseButton) {
+    .directive('promiseButton', function ($log, $timeout, PromiseButton, $sce) {
 
       return {
         restrict: 'A',
         transclude: true,
         template: '<span class="promise-button-container">' +
-        '<span class="original-content" ng-transclude></span>' +
-        '<span class="message"></span>' +
+        '<span class="original-content" ng-if="status===\'idle\'" ng-transclude></span>' +
+        '<span class="loading-message" ng-if="status===\'loading\'" ng-bind-html="vm.loadingTemplate"></span>' +
+        '<span class="success-message" ng-if="status===\'success\'" ng-bind-html="vm.successTemplate"></span>' +
+        '<span class="error-message" ng-if="status===\'error\'" ng-bind-html="vm.errorTemplate"></span>' +
         '</span>',
+        scope: true,
         link: function (scope, elem, attrs) {
           var warned = false;
           var opts = PromiseButton.getOptions(scope.$eval(attrs.promiseButtonOpts));
           var targetKey = attrs.promiseButtonTargetKey;
-          var originalContent = angular.element(elem[0].querySelector('.original-content'));
-          var messageNode = angular.element(elem[0].querySelector('.message')).detach();
-          var container = elem.children().eq(0);
+          var key = attrs.promiseButtonKey;
+          var eventPrefix = 'promiseButton.' + key + '.';
+
+          scope.vm = {
+            loadingTemplate: $sce.trustAsHtml(opts.loadingTemplate),
+            successTemplate: $sce.trustAsHtml(opts.successTemplate),
+            errorTemplate: $sce.trustAsHtml(opts.errorTemplate)
+          };
+
+          scope.status = 'idle';
+
+
+          function setLoading() {
+            scope.status = 'loading';
+            elem.attr('disabled', true);
+          }
+
+          function setResult(status) {
+            scope.status = status ? 'success' : 'error';
+            elem.attr('disabled', false);
+            $timeout(function () {
+              scope.status = 'idle';
+            }, opts.messageDuration);
+          }
+
+          if (key) {
+            scope.$on(eventPrefix + 'loading', setLoading);
+            scope.$on(eventPrefix + 'success', function () {
+              setResult(true);
+            });
+            scope.$on(eventPrefix + 'error', function () {
+              setResult(false);
+            });
+          }
 
           elem.bind('click', function () {
             //cancel original
@@ -31,16 +65,7 @@
                     PromiseButton.setButtonError(targetKey);
                   }
                 } else {
-                  var message = status ? opts.resolvedTemplate : opts.rejectedTemplate;
-                  messageNode.html(message);
-                  originalContent.detach();
-                  container.append(messageNode);
-                  elem.removeAttr('disabled');
-
-                  $timeout(function () {
-                    messageNode.detach();
-                    container.append(originalContent);
-                  }, opts.messageDuration);
+                  setResult(status);
                 }
               };
             }
@@ -49,10 +74,7 @@
               if (targetKey) {
                 PromiseButton.setButtonLoading(targetKey);
               } else {
-                originalContent.detach();
-                container.append(messageNode);
-                messageNode.html(opts.loadingTemplate);
-                elem.attr('disabled', true);
+                setLoading();
               }
               promise.then(finalize(true), finalize(false));
             } else {
@@ -66,4 +88,5 @@
       };
     }
   );
-})();
+})
+();

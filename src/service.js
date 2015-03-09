@@ -4,13 +4,11 @@
     .provider('PromiseButton', function () {
 
       var defaultOptions = {
-        resolvedTemplate: '✓',
-        rejectedTemplate: 'Oops, something went wrong',
+        successTemplate: '✓',
+        errorTemplate: 'Oops, something went wrong',
         loadingTemplate: 'loading..',
         messageDuration: 2000
       };
-
-      var optsPerKey = {};
 
       this.defaultOptions = defaultOptions;
 
@@ -23,12 +21,6 @@
         return {
           getOptions: function (externalOptions) {
             return angular.extend({}, defaultOptions, externalOptions || {});
-          },
-          getOptionsForKey: function (key) {
-            return angular.extend({}, defaultOptions, optsPerKey[key] || {});
-          },
-          setOptionsForKey: function (key, opts) {
-            optsPerKey[key] = opts;
           },
           setButtonLoading: function (key) {
             broadcastEvent('loading', key);
