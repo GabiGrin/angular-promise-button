@@ -10,9 +10,9 @@ angular.module('gg.promise-button', []);
         transclude: true,
         template: '<span class="promise-button-container">' +
         '<span class="original-content" ng-if="status===\'idle\'" ng-transclude></span>' +
-        '<span class="loading-message" ng-if="status===\'loading\'" ng-bind-html="vm.loadingTemplate"></span>' +
-        '<span class="success-message" ng-if="status===\'success\'" ng-bind-html="vm.successTemplate"></span>' +
-        '<span class="error-message" ng-if="status===\'error\'" ng-bind-html="vm.errorTemplate"></span>' +
+        '<span class="loading-message" ng-if="status===\'loading\'" ng-bind-html="promiseButton.loadingTemplate"></span>' +
+        '<span class="success-message" ng-if="status===\'success\'" ng-bind-html="promiseButton.successTemplate"></span>' +
+        '<span class="error-message" ng-if="status===\'error\'" ng-bind-html="promiseButton.errorTemplate"></span>' +
         '</span>',
         scope: true,
         link: function (scope, elem, attrs) {
@@ -22,7 +22,7 @@ angular.module('gg.promise-button', []);
           var key = attrs.promiseButtonKey;
           var eventPrefix = 'promiseButton.' + key + '.';
 
-          scope.vm = {
+          scope.promiseButton = {
             loadingTemplate: $sce.trustAsHtml(opts.loadingTemplate),
             successTemplate: $sce.trustAsHtml(opts.successTemplate),
             errorTemplate: $sce.trustAsHtml(opts.errorTemplate)
@@ -55,8 +55,6 @@ angular.module('gg.promise-button', []);
           }
 
           elem.bind('click', function () {
-            //cancel original
-
             scope.$apply(function () {
 
               var promise = scope.$eval(attrs.promiseButton);
