@@ -34,6 +34,11 @@
             elem.attr('disabled', true);
           }
 
+          function setIdle() {
+            elem.attr('disabled', false);
+            scope.status = 'idle';
+          }
+
           function setResult(status) {
             scope.status = status ? 'success' : 'error';
             elem.attr('disabled', false);
@@ -69,7 +74,7 @@
                     if (data || status) {
                       setResult(status);
                     } else {
-                      scope.status = 'idle';
+                      setIdle();
                     }
                   }
                 };
