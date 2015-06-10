@@ -111,6 +111,19 @@ describe('promise button ', function () {
       expect(elem.text()).toBe(defaultOptions.errorTemplate);
     });
 
+    it('should show ignore null rejections', function () {
+      $scope.loadData = function () {
+        return fakePromise(null, true);
+      };
+      var elem = createDirective('<button promise-button="loadData()">Load data</button>');
+
+      elem.triggerHandler('click');
+      $timeout.flush();
+
+      expect(elem.text()).toBe('Load data');
+    });
+
+
     it('should warn if onclick handler did not return promise, but just once', function () {
       $scope.loadData = function () {
         $scope.someVar = 'yo';

@@ -58,7 +58,7 @@
               var promise = scope.$eval(attrs.promiseButton);
 
               function finalize(status) {
-                return function () {
+                return function (data) {
                   if (targetKey) {
                     if (status) {
                       PromiseButton.setButtonSuccess(targetKey);
@@ -66,7 +66,11 @@
                       PromiseButton.setButtonError(targetKey);
                     }
                   } else {
-                    setResult(status);
+                    if (data || status) {
+                      setResult(status);
+                    } else {
+                      scope.status = 'idle';
+                    }
                   }
                 };
               }
